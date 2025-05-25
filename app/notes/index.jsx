@@ -1,5 +1,7 @@
 import { useState } from "react";
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Modal, TextInput } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput } from "react-native";
+import NoteList from "../../components/NoteList";
+import AddNoteModal from "../../components/AddNoteModal";
 
 const NoteScreen = () => {
   const [notes, setNotes] = useState([
@@ -24,50 +26,28 @@ const NoteScreen = () => {
   const [noteTitle, setNoteTitle] = useState('');
   const [noteContent, setNoteContent] = useState('');
 
+  const addNote = () => {
+    if (noteTitle.trim() === '' && noteContent.trim() === '') return;
+
+    setNotes( (prevNotes) => [...prevNotes, {id: Date.now.toString(), title: noteTitle, content: noteContent}]);
+    
+    setNoteTitle('');
+    setNoteContent('');
+    setModalVisible(false);
+  };
+
 
   return ( 
     <View style={styles.container}>
-      <FlatList 
-        data={notes}
-        keyExtractor={(item) => item.id}
-        renderItem={({item}) => (
-          <View style={styles.noteItem}>
-            <Text>{item.title}</Text>
-            <Text style={styles.noteText}>{item.content}</Text>
-          </View>
-        )} />
+      <NoteList notes={notes} />
 
         <TouchableOpacity style={styles.addbutton} onPress={() => setModalVisible(true)}>
           <Text style={styles.buttonText}>+ Add Note</Text>
         </TouchableOpacity>
 
-        <Modal visible={modalVisible} animationType="slide" transparent onRequestClose={() => setModalVisible(false)}>
-          <View style={styles.modalOverlay}>
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>Add a new note</Text>
-              <TextInput
-                style={styles.modalInput}
-                placeholder="Title"
-                value={noteTitle}
-                onChangeText={setNoteTitle}
-              />
-              <TextInput
-                style={styles.modalInput}
-                placeholder="Content"
-                value={noteContent}
-                onChangeText={setNoteContent}
-              />
-              <View style={styles.modalButtons}>
-                <TouchableOpacity style={styles.cancelButton} onPress={() => setModalVisible(false)}>
-                  <Text style={styles.cancelButtonText}>Cancel</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.saveButton}>
-                  <Text style={styles.saveButtonText}>Save</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
-        </Modal>
+      <AddNoteModal modalVisible={modalVisible} setModalVisible={setModalVisible} noteTitle={noteTitle} setNoteTitle={setNoteTitle} noteContent={noteContent} setNoteContent={setNoteContent} addNote={addNote} />
+
+        
     </View>
    );
 }
@@ -78,16 +58,7 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: '#fff'
   },
-  noteItem : {
-    padding: 10,
-    marginBottom: 10,
-    backgroundColor: '#f2f2f2',
-    borderRadius: 5
-  },
-  noteText : {
-    fontSize: 16,
-    color: '#333'
-  },
+  
   addbutton : {
     backgroundColor: '#007bff',
     paddingVertical: 10,
@@ -101,56 +72,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold'
   },
-  modalOverlay : {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)'
-  },
-  modalContent : {
-    backgroundColor: '#fff',
-    padding: 20,
-    borderRadius: 5
-  },
-  modalTitle : {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 10
-  },
-  modalInput : {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
-    padding: 10,
-    marginBottom: 10
-  },
-  modalButtons : {
-    flexDirection: 'row',
-    justifyContent: 'flex-end'
-  },
-  cancelButton : {
-    marginRight: 10,
-    padding: 10,
-    borderRadius: 5,
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderColor: '#ccc'
-  },
-  cancelButtonText : {
-    color: '#333'
-  },
-  saveButton : {
-    backgroundColor: '#007bff',
-    padding: 10,
-    borderRadius: 5,
-    alignItems: 'center',
-    justifyContent: 'center',
-    flex: 1
-  },
-  saveButtonText : {
-    color: '#fff'
-  }
+ 
 });
  
 export default NoteScreen;
